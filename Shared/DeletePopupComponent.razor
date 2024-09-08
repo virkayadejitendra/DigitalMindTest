@@ -1,10 +1,15 @@
 ﻿@if (IsVisible)
 {
-    <div class="popup">
-        <h4>@Title</h4>
-        <p>@Description</p>
-        <button @onclick="OnConfirm">Okay</button>
-        <button @onclick="OnCancel">Cancel</button>
+    <div class="modal-overlay">
+        <div class="modal-content">
+            <h4>@Title</h4>
+            <p>@Description</p>
+
+            <div class="button-container">
+                <button @onclick="OnConfirm" class="btn btn-primary">Okay</button>
+                <button @onclick="OnCancel" class="btn btn-secondary">Cancel</button>
+            </div>
+        </div>
     </div>
 }
 

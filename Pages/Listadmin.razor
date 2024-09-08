@@ -1,53 +1,105 @@
-﻿@page "/Listadmin"
+﻿@page "/"
 @using DigitalMindTest.Models;
-@inject HttpClient Http
+@inject HttpClient Http;
+@inject IJSRuntime JSRuntime;
 
-<h3>User List</h3>
-@if (users == null)
-{
-    <p>Loading...</p>
-}
-else
-{
-    <ul>
-        @foreach (var user in users)
-        {
-            <li>
-                <div>
-                    <strong>@user.name</strong> (@user.username) - @user.email
-                    <button @onclick="() => ConfirmDelete(user)">Delete</button>
-                </div>
-            </li>
-        }
-    </ul>
-}
-
-<DeletePopupComponent IsVisible="@showPopup" 
-                      Title="Delete User" 
+<!-- Delete Confirmation Popup -->
+<DeletePopupComponent IsVisible="@showPopup"
+                      Title="Delete User"
                       Description="Are you sure you want to delete this user?"
-                      OnConfirm="@DeleteUser" 
+                      OnConfirm="@DeleteUser"
                       OnCancel="@CancelDelete" />
+<!-- Content -->
+<div class="container-fluid">
+    <div class="table-responsive">
+        <table class="table table-dark table-sm">
+            <thead>
+                <tr class="text-center roboto-medium">
+                    <th>#</th>
+                    <th>NAME</th>
+                    <th>LAST NAME</th>
+                    <th>UPDATE</th>
+                    <th>DELETE</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (users == null)
+                {
+                    <tr>
+                        <td colspan="5" class="text-center">Loading...</td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var user in users)
+                    {
+                        <tr class="text-center">
+                            <td>@user.id</td>
+                            <td>@user.name</td>
+                            <td>@user.username</td>
+                            <td>
+                                <button type="button" class="btn btn-success">
+                                    <i class="fas fa-sync-alt"></i>
+                                </button>
+                            </td>
+                            <td>
+                                <button type="button" class="btn btn-warning" @onclick="() => ConfirmDelete(user)">
+                                    <i class="far fa-trash-alt"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <nav aria-label="Page navigation example">
+        <ul class="pagination justify-content-center">
+            <li class="page-item disabled">
+                <a class="page-link" href="#" tabindex="-1">Previous</a>
+            </li>
+            <li class="page-item"><a class="page-link" href="#">1</a></li>
+            <li class="page-item"><a class="page-link" href="#">2</a></li>
+            <li class="page-item"><a class="page-link" href="#">3</a></li>
+            <li class="page-item">
+                <a class="page-link" href="#">Next</a>
+            </li>
+        </ul>
+    </nav>
+</div>
+
 
 @code {
-    private List<User> users;
-    private User userToDelete;
+    private List<Root> users;
+    private Root userToDelete;
     private bool showPopup = false;
 
     protected override async Task OnInitializedAsync()
     {
-        users = await Http.GetFromJsonAsync<List<User>>("https://jsonplaceholder.typicode.com/users");
+        users = await Http.GetFromJsonAsync<List<Root>>("https://jsonplaceholder.typicode.com/users");
     }
 
-    private void ConfirmDelete(User user)
+    private void ConfirmDelete(Root user)
     {
         userToDelete = user;
         showPopup = true;
     }
 
-    private void DeleteUser()
+    private async Task DeleteUser()
     {
-        users.Remove(userToDelete);
         showPopup = false;
+        await JSRuntime.InvokeVoidAsync("showLoader");
+
+        // Simulate delay
+        await Task.Delay(5000);
+
+        users.Remove(userToDelete);
+
+        await JSRuntime.InvokeVoidAsync("hideLoader");
+
+       
+        userToDelete = null;
     }
 
     private void CancelDelete()
