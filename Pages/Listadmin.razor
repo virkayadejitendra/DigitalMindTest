@@ -1,0 +1,58 @@
+﻿@page "/Listadmin"
+@using DigitalMindTest.Models;
+@inject HttpClient Http
+
+<h3>User List</h3>
+@if (users == null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <ul>
+        @foreach (var user in users)
+        {
+            <li>
+                <div>
+                    <strong>@user.name</strong> (@user.username) - @user.email
+                    <button @onclick="() => ConfirmDelete(user)">Delete</button>
+                </div>
+            </li>
+        }
+    </ul>
+}
+
+<DeletePopupComponent IsVisible="@showPopup" 
+                      Title="Delete User" 
+                      Description="Are you sure you want to delete this user?"
+                      OnConfirm="@DeleteUser" 
+                      OnCancel="@CancelDelete" />
+
+@code {
+    private List<User> users;
+    private User userToDelete;
+    private bool showPopup = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        users = await Http.GetFromJsonAsync<List<User>>("https://jsonplaceholder.typicode.com/users");
+    }
+
+    private void ConfirmDelete(User user)
+    {
+        userToDelete = user;
+        showPopup = true;
+    }
+
+    private void DeleteUser()
+    {
+        users.Remove(userToDelete);
+        showPopup = false;
+    }
+
+    private void CancelDelete()
+    {
+        userToDelete = null;
+        showPopup = false;
+    }
+}

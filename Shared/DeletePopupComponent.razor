@@ -1,0 +1,26 @@
+﻿@if (IsVisible)
+{
+    <div class="popup">
+        <h4>@Title</h4>
+        <p>@Description</p>
+        <button @onclick="OnConfirm">Okay</button>
+        <button @onclick="OnCancel">Cancel</button>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public bool IsVisible { get; set; }
+
+    [Parameter]
+    public string Title { get; set; }
+
+    [Parameter]
+    public string Description { get; set; }
+
+    [Parameter]
+    public EventCallback OnConfirm { get; set; }
+
+    [Parameter]
+    public EventCallback OnCancel { get; set; }
+}
